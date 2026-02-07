@@ -15,8 +15,8 @@ export default function BlogPost() {
     useEffect(() => {
         // Fetch post and comments concurrently
         Promise.all([
-            fetch(`http://localhost:5080/api/blog/${id}`).then(res => res.json()),
-            fetch(`http://localhost:5080/api/comments/${id}`).then(res => res.json()),
+            fetch(`http://localhost:5000/api/blog/${id}`).then(res => res.json()),
+            fetch(`http://localhost:5000/api/comments/${id}`).then(res => res.json()),
         ])
             .then(([postData, commentsData]) => {
                 // Check if post fetch was successful
@@ -42,7 +42,7 @@ export default function BlogPost() {
         if (!text.trim()) return;
         const commentAuthor = user ? user.username : "Anonymous"; // Use logged-in user or "Anonymous"
         try {
-            const res = await fetch("http://localhost:5080/api/comments", {
+            const res = await fetch("http://localhost:5000/api/comments", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 // UNSAFE: postId is not validated on frontend, user is assumed/user-provided.

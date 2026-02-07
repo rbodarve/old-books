@@ -18,7 +18,7 @@ export default function BlogPostsList({ currentUser }) {
     const fetchBlogPosts = async () => {
         try {
             setLoading(true);
-            const response = await fetch('http://localhost:5080/api/blog');
+            const response = await fetch('http://localhost:5000/api/blog');
             if (!response.ok) throw new Error('Failed to fetch blog posts');
             const data = await response.json();
             setBlogPosts(Array.isArray(data) ? data : []);
@@ -41,7 +41,7 @@ export default function BlogPostsList({ currentUser }) {
         setSubmitting(true);
         try {
             const token = sessionStorage.getItem('token');
-            const response = await fetch('http://localhost:5080/api/blog', {
+            const response = await fetch('http://localhost:5000/api/blog', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
