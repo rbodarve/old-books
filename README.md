@@ -1,53 +1,243 @@
-# Getting Started with Create React App
+# 📚 Old Books - Rare & Antique Books E-Commerce Platform
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A full-stack e-commerce web application for buying and selling rare and antique books. Built with the MERN stack (MongoDB, Express.js, React, Node.js), this platform features user authentication, book catalog management, shopping cart functionality, reviews, and a blog system.
 
-## Available Scripts
+## ✨ Features
 
-In the project directory, you can run:
+- **User Authentication & Authorization**
+  - Secure registration and login with JWT
+  - Password encryption using bcrypt
+  - Role-based access control (Admin/User)
 
-### `npm start`
+- **Book Catalog**
+  - Browse extensive collection of rare and antique books
+  - Detailed book information with cover images
+  - Search and filter functionality
+  - Book categorization
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+- **Shopping Experience**
+  - Interactive shopping cart
+  - Book reviews and ratings
+  - Comment system for community engagement
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+- **Admin Dashboard**
+  - Complete CRUD operations for books
+  - User management
+  - Order tracking
+  - Inventory management
 
-### `npm test`
+- **Blog System**
+  - Articles about rare books
+  - Reading recommendations
+  - Literary history content
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## 🛠️ Tech Stack
 
-### `npm run build`
+### Frontend
+- **React** (v19.2.0) - UI library
+- **React Router DOM** (v7.9.6) - Client-side routing
+- **Bootstrap** (v5.3.8) - UI framework
+- **FontAwesome** - Icons
+- **React Scripts** - Build tooling
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### Backend
+- **Node.js** with **Express.js** (v4.22.1) - Server framework
+- **MongoDB** with **Mongoose** (v7.8.8) - Database
+- **JWT** (jsonwebtoken v9.0.3) - Authentication
+- **Bcrypt** (v6.0.0) - Password hashing
+- **CORS** - Cross-origin resource sharing
+- **Dotenv** - Environment variable management
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## 📁 Project Structure
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+```
+old-books/
+├── backend/
+│   ├── config/          # Database configuration
+│   ├── controllers/     # Request handlers
+│   ├── middleware/      # Auth middleware
+│   ├── models/          # Mongoose schemas
+│   ├── routes/          # API routes
+│   ├── ssl/             # SSL certificates (not committed)
+│   └── server.js        # Entry point
+├── frontend/
+│   ├── public/          # Static assets
+│   │   └── images/      # Book cover images
+│   ├── src/
+│   │   ├── components/  # React components
+│   │   ├── pages/       # Page components
+│   │   ├── utils/       # Helper functions
+│   │   └── App.js       # Main app component
+│   └── package.json
+└── README.md
+```
 
-### `npm run eject`
+## 🚀 Getting Started
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+### Prerequisites
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+- **Node.js** (v14 or higher)
+- **MongoDB** (v4.4 or higher)
+- **npm** or **yarn**
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+### Installation
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/rbodarve/old-books.git
+   cd old-books
+   ```
 
-## Learn More
+2. **Install dependencies**
+   ```bash
+   # Install backend dependencies
+   cd backend
+   npm install
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+   # Install frontend dependencies
+   cd ../frontend
+   npm install
+   ```
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+3. **Set up environment variables**
 
-### Code Splitting
+   Create a `.env` file in the `backend/` directory:
+   ```env
+   # MongoDB Connection
+   MONGODB_URI=mongodb://localhost:27017/oldbooks
+   
+   # JWT Secret (use a strong random string)
+   JWT_SECRET=your_jwt_secret_key_here
+   
+   # Server Configuration
+   PORT=5000
+   NODE_ENV=development
+   
+   # Frontend URL (for CORS)
+   FRONTEND_URL=http://localhost:3000
+   ```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+4. **Start MongoDB**
+   ```bash
+   # On Linux/Mac
+   sudo service mongod start
+   
+   # Or if using MongoDB Atlas, use your connection string in .env
+   ```
+
+5. **Run the application**
+
+   **Option 1: Run both servers separately**
+   ```bash
+   # Terminal 1 - Start backend server
+   cd backend
+   npm start
+   
+   # Terminal 2 - Start frontend development server
+   cd frontend
+   npm start
+   ```
+
+   **Option 2: Using HTTPS (if SSL certificates are configured)**
+   ```bash
+   cd backend
+   npm run start:https
+   ```
+
+6. **Access the application**
+   - Frontend: [http://localhost:3000](http://localhost:3000)
+   - Backend API: [http://localhost:5000](http://localhost:5000)
+
+### Seeding the Database (Optional)
+
+If you have a seed script:
+```bash
+cd backend
+npm run seed
+```
+
+## 🔑 API Endpoints
+
+### Authentication
+- `POST /api/auth/register` - Register new user
+- `POST /api/auth/login` - User login
+
+### Books
+- `GET /api/books` - Get all books
+- `GET /api/books/:id` - Get book by ID
+- `POST /api/books` - Create book (Admin only)
+- `PUT /api/books/:id` - Update book (Admin only)
+- `DELETE /api/books/:id` - Delete book (Admin only)
+
+### Reviews
+- `GET /api/reviews/:bookId` - Get reviews for a book
+- `POST /api/reviews` - Create review (Authenticated users)
+
+### Users
+- `GET /api/users/profile` - Get user profile (Authenticated)
+- `PUT /api/users/profile` - Update profile (Authenticated)
+
+### Blog
+- `GET /api/blog` - Get all blog posts
+- `GET /api/blog/:id` - Get blog post by ID
+- `POST /api/blog` - Create blog post (Admin only)
+
+## 🎨 Features in Detail
+
+### User Roles
+- **Regular Users**: Browse books, add to cart, write reviews, read blog
+- **Admin Users**: Full CRUD on books, manage users, create blog posts
+
+### Security Features
+- Password hashing with bcrypt
+- JWT-based authentication
+- Protected routes with authentication middleware
+- CORS configuration
+- Environment variable protection
+
+## 📦 Build for Production
+
+```bash
+# Build frontend
+cd frontend
+npm run build
+
+# The build folder will be created with optimized production files
+# Serve these static files from your backend or hosting platform
+```
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+1. Fork the project
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## 📝 License
+
+This project is licensed under the ISC License.
+
+## 👥 Authors
+
+- **rbodarve** - [GitHub Profile](https://github.com/rbodarve)
+
+## 🙏 Acknowledgments
+
+- README template inspired by [awesome-readme](https://github.com/matiassingers/awesome-readme) by [Matias Singers](https://github.com/matiassingers)
+- Book cover images from public domain sources
+- Built with Create React App
+- Icons by [FontAwesome](https://fontawesome.com/)
+
+## 📞 Support
+
+For support, please open an issue in the GitHub repository.
+
+---
+
+**Note**: This is a project for educational and demonstration purposes. Make sure to configure proper security measures before deploying to production.
 
 ### Analyzing the Bundle Size
 
