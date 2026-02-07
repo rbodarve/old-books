@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-// --- Imports ---
 import AppNavbar from "./components/AppNavbar.js";
 import Login from "./components/Login.js";
 import Register from "./components/Register.js";
@@ -16,12 +15,10 @@ import ArticlesList from "./components/ArticlesList.js";
 import BlogPostsList from "./components/BlogPostsList.js";
 import ArticleDetail from "./components/ArticleDetail.js";
 import BlogPostDetail from "./components/BlogPostDetail.js";
-// --- ADMIN COMPONENTS ---
 import AdminDashboard from "./pages/admin/AdminDashboard.js";
 import AdminBookList from "./pages/admin/AdminBookList.js";
 import CreateBookPage from "./pages/admin/CreateBookPage.js";
 import AdminBookEdit from "./pages/admin/AdminBookEdit.js";
-// === User Access Control Wrapper ===
 const UserWrapper = ({ currentUser, children }) => {
     if (!currentUser) {
         return <Navigate to="/login" replace />;
@@ -29,7 +26,6 @@ const UserWrapper = ({ currentUser, children }) => {
     // Standard user can access content
     return children;
 };
-// === Admin Access Control Wrapper (Remains the same) ===
 const AdminWrapper = ({ currentUser, children }) => {
     if (!currentUser) {
         return <Navigate to="/login" replace />;

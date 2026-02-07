@@ -3,9 +3,6 @@ import Book from '../models/bookModel.js';
 import asyncHandler from 'express-async-handler';
 import mongoose from 'mongoose';
 
-// @route POST /api/reviews
-// @desc Add a review to a book
-// @access Private (Requires 'protect' middleware)
 export const createReview = asyncHandler(async (req, res) => {
     const { bookId, rating, content } = req.body;
 
@@ -56,9 +53,6 @@ export const createReview = asyncHandler(async (req, res) => {
     });
 });
 
-// @route GET /api/reviews/:bookId
-// @desc Get all reviews for a specific book
-// @access Public (Anyone can view reviews)
 export const getReviewsByBookId = asyncHandler(async (req, res) => {
     const { bookId } = req.params;
     if (!bookId) {
@@ -73,9 +67,6 @@ export const getReviewsByBookId = asyncHandler(async (req, res) => {
     res.json(reviews);
 });
 
-// @route GET /api/reviews/book/:bookId/stats
-// @desc Get review statistics for a book (average rating, count)
-// @access Public
 export const getReviewStats = asyncHandler(async (req, res) => {
     const { bookId } = req.params;
     if (!bookId) {
@@ -102,9 +93,6 @@ export const getReviewStats = asyncHandler(async (req, res) => {
     res.json(stats[0]);
 });
 
-// @route DELETE /api/reviews/:reviewId
-// @desc Delete a review (own review, manager, or admin)
-// @access Private
 export const deleteReview = asyncHandler(async (req, res) => {
     const { reviewId } = req.params;
 
@@ -124,9 +112,6 @@ export const deleteReview = asyncHandler(async (req, res) => {
     res.json({ message: "Review deleted successfully" });
 });
 
-// @route PUT /api/reviews/:reviewId/warning
-// @desc Add or update warning on a review (manager or admin)
-// @access Private (manager or admin only)
 export const addReviewWarning = asyncHandler(async (req, res) => {
     const { reviewId } = req.params;
     const { warning } = req.body;
@@ -155,9 +140,6 @@ export const addReviewWarning = asyncHandler(async (req, res) => {
     res.json({ message: "Warning added to review", review });
 });
 
-// @route PUT /api/reviews/:bookId/toggle-disable
-// @desc Toggle reviews disabled status for a book (manager or admin)
-// @access Private (manager or admin only)
 export const toggleReviewsDisabled = asyncHandler(async (req, res) => {
     const { bookId } = req.params;
 

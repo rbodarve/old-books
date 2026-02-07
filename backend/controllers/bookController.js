@@ -1,9 +1,7 @@
 import Book from "../models/bookModel.js";
 import mongoose from "mongoose";
 
-// ===================================
 // GET ALL BOOKS (Used by HomePage.js)
-// ===================================
 export const getAllBooks = async (req, res) => {
     try {
         const { category, minPrice, maxPrice, condition, search } = req.query;
@@ -64,9 +62,7 @@ export const getAllBooks = async (req, res) => {
     }
 };
 
-// ===================================
 // GET BOOK BY ID (Used by SingleBookView.js)
-// ===================================
 export const getBookById = async (req, res) => {
     try {
         const { id } = req.params;
@@ -82,9 +78,7 @@ export const getBookById = async (req, res) => {
     }
 };
 
-// ===================================
 // CREATE BOOK (Used by CreateBookPage.js - Admin Only)
-// ===================================
 export const createBook = async (req, res) => {
     try {
         const { title, author, isbn, publicationDate, description, category, condition, price, quantity, coverImage } = req.body;
@@ -134,9 +128,7 @@ export const createBook = async (req, res) => {
     }
 };
 
-// ===================================
 // UPDATE BOOK (Admin Only)
-// ===================================
 export const updateBook = async (req, res) => {
     try {
         const { id } = req.params;
@@ -187,9 +179,7 @@ export const updateBook = async (req, res) => {
     }
 };
 
-// ===================================
 // DELETE BOOK (Admin Only)
-// ===================================
 export const deleteBook = async (req, res) => {
     try {
         const { id } = req.params;

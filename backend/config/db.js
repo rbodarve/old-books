@@ -8,7 +8,6 @@ const connectDB = async () => {
         await mongoose.connect(mongoURI, {
             useNewUrlParser: true,
             useUnifiedTopology: true,
-            // Avoid invalid write concern
             w: "majority", // safe default
         });
         console.log("MongoDB connected successfully");

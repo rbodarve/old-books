@@ -2,14 +2,11 @@ import User from "../models/userModel.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 
-// Fallback secret for dev/test
 const JWT_FALLBACK_SECRET = "insecure-test-secret";
-// Generate JWT token
 const generateToken = (id, role) => {
     const secret = process.env.JWT_SECRET || JWT_FALLBACK_SECRET;
     return jwt.sign({ id, role }, secret, { expiresIn: "30d" });
 };
-// REGISTER
 export const register = async (req, res) => {
     try {
         const { username, email, password, role } = req.body;
@@ -20,7 +17,6 @@ export const register = async (req, res) => {
         const exists = await User.findOne({ email: normalizedEmail });
         if (exists) return res.status(409).json({ message: "Email already registered" });
 
-        // Hash password with bcrypt
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password.trim(), salt);
 
@@ -46,7 +42,6 @@ export const register = async (req, res) => {
         return res.status(500).json({ error: "Registration failed" });
     }
 };
-// LOGIN
 export const login = async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -55,7 +50,6 @@ export const login = async (req, res) => {
         const normalizedEmail = email.trim().toLowerCase();
         const user = await User.findOne({ email: normalizedEmail });
         
-        // Compare password with bcrypt
         const isPasswordValid = user && await bcrypt.compare(password.trim(), user.password);
         
         if (!user || !isPasswordValid) {

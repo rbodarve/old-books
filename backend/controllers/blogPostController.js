@@ -1,8 +1,6 @@
 import BlogPost from "../models/blogPostModel.js";
 import mongoose from "mongoose";
-// ===================================
 // GET ALL POSTS (Used by HomePage.js)
-// ===================================
 export const getAllPosts = async (req, res) => {
 try {
 const posts = await BlogPost.find({}).populate('createdBy', 'username role').sort({ createdAt: -1 });
@@ -12,9 +10,7 @@ console.error("Error fetching all posts:", err);
 return res.status(500).json({ error: "Failed to fetch posts" });
 }
 };
-// ===================================
 // GET POST BY ID (Used by SinglePostView.js)
-// ===================================
 export const getPostById = async (req, res) => {
 try {
 const { id } = req.params;
@@ -29,9 +25,7 @@ console.error("Error fetching single post:", err);
 return res.status(500).json({ error: "Failed to fetch post" });
 }
 };
-// ===================================
 // CREATE POST (Used by CreatePostPage.js)
-// ===================================
 export const createPost = async (req, res) => {
 try {
 let { title, content } = req.body;
@@ -54,6 +48,3 @@ console.error("Error creating post:", err);
 return res.status(500).json({ error: "Failed to create post" });
 }
 };
-// Placeholder for other functions (Update/Delete)
-// export const updatePost = async (req, res) => { /* ... */ };
-// export const deletePost = async (req, res) => { /* ... */ };

@@ -28,7 +28,6 @@ export default function Login({ setCurrentUser }) {
                 // Handle non-200 responses (e.g., 401 Unauthorized, 404 Not Found)
                 throw new Error(data.message || 'Login failed. Check credentials.');
             }
-            // --- CRITICAL SUCCESS LOGIC ---
             // 1. Extract Token and User Data
             const { token, user } = data; // Assumes your backend returns { token, user: { _id, email, role, ... } }
             // 2. Save to Session Storage

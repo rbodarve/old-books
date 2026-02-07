@@ -1,7 +1,6 @@
 import jwt from "jsonwebtoken";
 // 1. CONFIRMATION: The path must be correct:
 import User from "../models/userModel.js";
-// Fallback secret for dev/test
 const JWT_FALLBACK_SECRET = "insecure-test-secret";
 // Protect routes
 export const protect = async (req, res, next) => {
