@@ -1,0 +1,25 @@
+{
+  "name": "old-books",
+  "version": "1.0.0",
+  "description": "A full-stack e-commerce platform for rare and antique books",
+  "private": true,
+  "scripts": {
+    "start": "npm --prefix backend start",
+    "backend": "npm --prefix backend run dev",
+    "frontend": "npm --prefix frontend start",
+    "dev": "concurrently \"npm run backend\" \"npm run frontend\"",
+    "install-all": "npm install && npm --prefix backend install && npm --prefix frontend install"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "keywords": [
+    "books",
+    "e-commerce",
+    "antique",
+    "rare-books",
+    "mern-stack"
+  ],
+  "author": "rbodarve",
+  "license": "ISC"
+}
