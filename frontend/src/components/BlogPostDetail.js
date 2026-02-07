@@ -19,7 +19,7 @@ export default function BlogPostDetail({ currentUser }) {
 
     const fetchBlogPost = async () => {
         try {
-            const response = await fetch(`http://localhost:5000/api/blog/${id}`);
+            const response = await fetch(`http://localhost:5080/api/blog/${id}`);
             if (!response.ok) throw new Error('Blog post not found');
             const data = await response.json();
             setBlogPost(data);
@@ -34,7 +34,7 @@ export default function BlogPostDetail({ currentUser }) {
 
     const fetchComments = async () => {
         try {
-            const response = await fetch(`http://localhost:5000/api/comments/BlogPost/${id}`);
+            const response = await fetch(`http://localhost:5080/api/comments/BlogPost/${id}`);
             if (!response.ok) throw new Error('Failed to fetch comments');
             const data = await response.json();
             setComments(Array.isArray(data) ? data : []);
@@ -63,7 +63,7 @@ export default function BlogPostDetail({ currentUser }) {
                 return;
             }
 
-            const response = await fetch('http://localhost:5000/api/comments', {
+            const response = await fetch('http://localhost:5080/api/comments', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -96,7 +96,7 @@ export default function BlogPostDetail({ currentUser }) {
 
         try {
             const token = sessionStorage.getItem('token');
-            const response = await fetch(`http://localhost:5000/api/comments/${commentId}`, {
+            const response = await fetch(`http://localhost:5080/api/comments/${commentId}`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -116,7 +116,7 @@ export default function BlogPostDetail({ currentUser }) {
     const handleToggleCommentsDisabled = async () => {
         const token = sessionStorage.getItem('token');
         try {
-            const response = await fetch(`http://localhost:5000/api/comments/BlogPost/${id}/toggle-disable`, {
+            const response = await fetch(`http://localhost:5080/api/comments/BlogPost/${id}/toggle-disable`, {
                 method: 'PUT',
                 headers: {
                     'Authorization': `Bearer ${token}`,

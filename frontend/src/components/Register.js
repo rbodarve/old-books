@@ -4,7 +4,7 @@ export default function Register() {
   const [form, setForm] = useState({ username: "", email: "", password: "", confirmPassword: "" });
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
-  const API_URL = "http://localhost:5000/api/auth/register";
+  const API_URL = "http://localhost:5080/api/auth/register";
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
   const handleSubmit = async (e) => {
     e.preventDefault();

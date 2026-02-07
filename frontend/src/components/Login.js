@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 // via props (or context) to update the global user state in App.js.
 // If you are passing it via props, you must adjust the component function signature
 // to `export default function Login({ setCurrentUser }) { ... }`.
-const API_LOGIN_URL = 'http://localhost:5000/api/auth/login'; // Adjust endpoint if needed
+const API_LOGIN_URL = 'http://localhost:5080/api/auth/login'; // Adjust endpoint if needed
 export default function Login({ setCurrentUser }) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');

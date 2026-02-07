@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 
-const API_REVIEW_URL = 'http://localhost:5000/api/reviews';
+const API_REVIEW_URL = 'http://localhost:5080/api/reviews';
 
 const formatTimeElapsed = (dateString) => {
     const now = new Date();

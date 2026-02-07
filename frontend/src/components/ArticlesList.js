@@ -18,7 +18,7 @@ export default function ArticlesList({ currentUser }) {
     const fetchArticles = async () => {
         try {
             setLoading(true);
-            const response = await fetch('http://localhost:5000/api/articles');
+            const response = await fetch('http://localhost:5080/api/articles');
             if (!response.ok) throw new Error('Failed to fetch articles');
             const data = await response.json();
             setArticles(Array.isArray(data) ? data : []);
@@ -41,7 +41,7 @@ export default function ArticlesList({ currentUser }) {
         setSubmitting(true);
         try {
             const token = sessionStorage.getItem('token');
-            const response = await fetch('http://localhost:5000/api/articles', {
+            const response = await fetch('http://localhost:5080/api/articles', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

@@ -69,7 +69,7 @@ export default function BookCatalog({ currentUser }) {
             if (minPrice) params.append('minPrice', minPrice);
             if (maxPrice) params.append('maxPrice', maxPrice);
 
-            const response = await fetch(`http://localhost:5000/api/books?${params.toString()}`);
+            const response = await fetch(`http://localhost:5080/api/books?${params.toString()}`);
             if (!response.ok) throw new Error('Failed to fetch books');
 
             const data = await response.json();

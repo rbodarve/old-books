@@ -16,9 +16,9 @@ export default function BookDetail({ currentUser }) {
     useEffect(() => {
         // Fetch book, reviews, and stats
         Promise.all([
-            fetch(`http://localhost:5000/api/books/${id}`).then(res => res.json()),
-            fetch(`http://localhost:5000/api/reviews/book/${id}`).then(res => res.json()),
-            fetch(`http://localhost:5000/api/reviews/book/${id}/stats`).then(res => res.json()),
+            fetch(`http://localhost:5080/api/books/${id}`).then(res => res.json()),
+            fetch(`http://localhost:5080/api/reviews/book/${id}`).then(res => res.json()),
+            fetch(`http://localhost:5080/api/reviews/book/${id}/stats`).then(res => res.json()),
         ])
             .then(([bookData, reviewsData, statsData]) => {
                 if (bookData.title) {
@@ -43,7 +43,7 @@ export default function BookDetail({ currentUser }) {
     const handleToggleReviewsDisabled = async () => {
         const token = sessionStorage.getItem('token');
         try {
-            const response = await fetch(`http://localhost:5000/api/reviews/${id}/toggle-disable`, {
+            const response = await fetch(`http://localhost:5080/api/reviews/${id}/toggle-disable`, {
                 method: 'PUT',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -70,7 +70,7 @@ export default function BookDetail({ currentUser }) {
         
         const token = sessionStorage.getItem('token');
         try {
-            const response = await fetch(`http://localhost:5000/api/reviews/${reviewId}`, {
+            const response = await fetch(`http://localhost:5080/api/reviews/${reviewId}`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${token}`
