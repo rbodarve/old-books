@@ -1,8 +1,8 @@
-# 📚 Old Books - Rare & Antique Books E-Commerce Platform
+# Old Books - Rare & Antique Books E-Commerce Platform
 
 A full-stack e-commerce web application for buying and selling rare and antique books. Built with the MERN stack (MongoDB, Express.js, React, Node.js), this platform features user authentication, book catalog management, shopping cart functionality, reviews, and a blog system.
 
-## ✨ Features
+## Features
 
 - **User Authentication & Authorization**
   - Secure registration and login with JWT
@@ -31,7 +31,7 @@ A full-stack e-commerce web application for buying and selling rare and antique 
   - Reading recommendations
   - Literary history content
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 ### Frontend
 - **React** (v19.2.0) - UI library
@@ -48,7 +48,7 @@ A full-stack e-commerce web application for buying and selling rare and antique 
 - **CORS** - Cross-origin resource sharing
 - **Dotenv** - Environment variable management
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 old-books/
@@ -72,7 +72,7 @@ old-books/
 └── README.md
 ```
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 
@@ -156,7 +156,7 @@ cd backend
 npm run seed
 ```
 
-## 🔑 API Endpoints
+## API Endpoints
 
 ### Authentication
 - `POST /api/auth/register` - Register new user
@@ -182,7 +182,7 @@ npm run seed
 - `GET /api/blog/:id` - Get blog post by ID
 - `POST /api/blog` - Create blog post (Admin only)
 
-## 🎨 Features in Detail
+## Features in Detail
 
 ### User Roles
 - **Regular Users**: Browse books, add to cart, write reviews, read blog
@@ -195,7 +195,7 @@ npm run seed
 - CORS configuration
 - Environment variable protection
 
-## 📦 Build for Production
+## Build for Production
 
 ```bash
 # Build frontend
@@ -206,7 +206,7 @@ npm run build
 # Serve these static files from your backend or hosting platform
 ```
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
@@ -216,45 +216,25 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
-## 📝 License
+## License
 
 This project is licensed under the ISC License.
 
-## 👥 Authors
+## Authors
 
 - **rbodarve** - [GitHub Profile](https://github.com/rbodarve)
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - README template inspired by [awesome-readme](https://github.com/matiassingers/awesome-readme) by [Matias Singers](https://github.com/matiassingers)
 - Book cover images from public domain sources
 - Built with Create React App
 - Icons by [FontAwesome](https://fontawesome.com/)
 
-## 📞 Support
+## Support
 
 For support, please open an issue in the GitHub repository.
 
 ---
 
 **Note**: This is a project for educational and demonstration purposes. Make sure to configure proper security measures before deploying to production.
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
