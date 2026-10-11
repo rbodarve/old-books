@@ -2,6 +2,44 @@
 
 A full-stack e-commerce web application for buying and selling rare and antique books. Built with the MERN stack (MongoDB, Express.js, React, Node.js), this platform features user authentication, book catalog management, shopping cart functionality, reviews, and a blog system.
 
+## Course Context
+
+This application is the course project for **COM231 – CTINASSL (Information Assurance and Security)**, Term 2, AY 2025–2026. The course documentation calls the application **Old Store Collection**. It was submitted on February 13, 2026.
+
+### Project brief
+
+The course asked each team to build a small-to-medium business web application, for example an e-commerce site. The application had to follow secure coding practices and use web server hardening techniques.
+
+### Deliverables
+
+1. A documentation report with these chapters:
+   1. Introduction
+   2. Web application screen designs
+   3. Threat model
+   4. Secure coding practices implementation
+   5. Server hardening techniques implementation
+   6. Web vulnerability assessment report (OWASP ZAP, initial and post)
+   7. Individual reflection
+2. A video presentation with a walkthrough of the application, the threat model, the security fixes, and the ZAP reports.
+
+### Security work done for the course
+
+```
+Build app ──► Initial OWASP ZAP scan ──► STRIDE threat model ──► Fix code and server ──► Post ZAP scan
+```
+
+- **Threat model:** STRIDE. It covers 4 user roles (visitor, customer, manager, admin) and the trust boundary between internet users and the backend API and database.
+- **Initial ZAP scan:** 13 alerts. 5 were Medium, 4 were Low and 4 were Informational. Examples: no Content Security Policy, CORS misconfiguration, HTTP only, no anti-clickjacking header, and an `X-Powered-By` header leak.
+- **Fixes:** `backend/server.js` disables `X-Powered-By` and sets these headers:
+  - `Strict-Transport-Security` (HSTS)
+  - `Content-Security-Policy` with all directives defined
+  - `X-Frame-Options: DENY`
+  - `X-Content-Type-Options: nosniff`
+  - `Cache-Control: no-store` for sensitive responses
+
+  The backend also restricts CORS origins. For the course, it also ran over HTTPS. The current setup uses HTTP only (see [Run the application](#getting-started)).
+- **Post ZAP scan:** The report marks all 12 mitigations as implemented.
+
 ## Features
 
 - **User Authentication & Authorization**
@@ -128,7 +166,7 @@ old-books/
 
 5. **Run the application**
 
-   **Option 1: Run both servers separately**
+   Run the backend and the frontend in two terminals:
    ```bash
    # Terminal 1 - Start backend server
    cd backend
@@ -139,11 +177,7 @@ old-books/
    npm start
    ```
 
-   **Option 2: Using HTTPS (if SSL certificates are configured)**
-   ```bash
-   cd backend
-   npm run start:https
-   ```
+   The frontend calls the backend at `http://localhost:5000`, so run the backend over HTTP with `npm start`. The `start:https`, `start:http` and `dev:https` scripts in `backend/package.json` use Unix-style environment variables. They do not run in PowerShell or cmd.
 
 6. **Access the application**
    - Frontend: [http://localhost:3000](http://localhost:3000)
