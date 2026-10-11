@@ -11,10 +11,9 @@ import BookCatalog from "./components/BookCatalog.js";
 import Cart from "./components/Cart.js";
 import Dashboard from "./components/Dashboard.js";
 import BookDetail from "./components/BookDetail.js";
-import ArticlesList from "./components/ArticlesList.js";
-import BlogPostsList from "./components/BlogPostsList.js";
-import ArticleDetail from "./components/ArticleDetail.js";
-import BlogPostDetail from "./components/BlogPostDetail.js";
+import ContentList from "./components/ContentList.js";
+import ContentDetail from "./components/ContentDetail.js";
+import { articles, blogPosts } from "./components/contentTypes.js";
 import AdminDashboard from "./pages/admin/AdminDashboard.js";
 import AdminBookList from "./pages/admin/AdminBookList.js";
 import CreateBookPage from "./pages/admin/CreateBookPage.js";
@@ -86,11 +85,10 @@ export default function App() {
                 <Route path="/about" element={<UserWrapper currentUser={currentUser}><About /></UserWrapper>} />
                 <Route path="/services" element={<UserWrapper currentUser={currentUser}><Services /></UserWrapper>} />
                 <Route path="/contact" element={<UserWrapper currentUser={currentUser}><Contact /></UserWrapper>} />
-                <Route path="/articles" element={<UserWrapper currentUser={currentUser}><ArticlesList currentUser={currentUser} /></UserWrapper>} />
-                <Route path="/article/:id" element={<UserWrapper currentUser={currentUser}><ArticleDetail currentUser={currentUser} /></UserWrapper>} />
-                <Route path="/blog-posts" element={<UserWrapper currentUser={currentUser}><BlogPostsList currentUser={currentUser} /></UserWrapper>} />
-                <Route path="/blog-post/:id" element={<UserWrapper currentUser={currentUser}><BlogPostDetail currentUser={currentUser} /></UserWrapper>} />
-                <Route path="/blog-post/:id" element={<UserWrapper currentUser={currentUser}><BlogPostDetail /></UserWrapper>} />
+                <Route path="/articles" element={<UserWrapper currentUser={currentUser}><ContentList key="articles" type={articles} currentUser={currentUser} /></UserWrapper>} />
+                <Route path="/article/:id" element={<UserWrapper currentUser={currentUser}><ContentDetail key="article" type={articles} currentUser={currentUser} /></UserWrapper>} />
+                <Route path="/blog-posts" element={<UserWrapper currentUser={currentUser}><ContentList key="blog-posts" type={blogPosts} currentUser={currentUser} /></UserWrapper>} />
+                <Route path="/blog-post/:id" element={<UserWrapper currentUser={currentUser}><ContentDetail key="blog-post" type={blogPosts} currentUser={currentUser} /></UserWrapper>} />
                 <Route path="/user-dashboard" element={<UserWrapper currentUser={currentUser}><Dashboard /></UserWrapper>} />
                 {/* 3. PROTECTED ADMIN ROUTES */}
                 <Route

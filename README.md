@@ -42,6 +42,7 @@ A full-stack e-commerce web application for buying and selling rare and antique 
 
 ### Backend
 - **Node.js** with **Express.js** (v4.22.1) - Server framework
+- **express-async-handler** (v1.2.0) - Passes errors from async route handlers to Express
 - **MongoDB** with **Mongoose** (v7.8.8) - Database
 - **JWT** (jsonwebtoken v9.0.3) - Authentication
 - **Bcrypt** (v6.0.0) - Password hashing
@@ -205,6 +206,41 @@ npm run build
 # The build folder will be created with optimized production files
 # Serve these static files from your backend or hosting platform
 ```
+
+## Simplification changes (2026-10-11)
+
+These changes keep all URLs, API calls and visible pages the same. The backend models, routes and database collections are not changed. Backups of every changed or deleted file are in `C:\Users\rboda\backups\old-books-cuts-2026-10-11\`.
+
+### Fix: declare the missing `express-async-handler` dependency
+
+- **What changed:** `express-async-handler` (`^1.2.0`) is now listed in `backend/package.json`.
+- **Files:** `backend/package.json`, `backend/package-lock.json`, `README.md` (Tech Stack).
+- **Why:** `backend/controllers/commentController.js`, `backend/controllers/reviewController.js` and `backend/routes/articleRoutes.js` import this package. It was not declared, so `npm start` in `backend/` failed with `ERR_MODULE_NOT_FOUND`.
+- **How to undo:** In `backend/`, run `npm uninstall express-async-handler`. The backend then fails to start again.
+
+### Cut 1: remove the unused `web-vitals` package
+
+- **What changed:** `web-vitals` is removed from the frontend dependencies.
+- **Files:** `frontend/package.json`, `frontend/package-lock.json`.
+- **Why:** No file in `frontend/src` or `frontend/public` imports `web-vitals` or `reportWebVitals`. The package was installed but never used.
+- **How to undo:** In `frontend/`, run `npm install web-vitals@^5.1.0`.
+
+### Cut 2: merge the duplicated Article and Blog Post components
+
+- **What changed:** The article pages and the blog post pages now use one shared list component and one shared detail component. Each content type passes its settings as a `type` prop: the API path, the comment type, the route prefixes, the labels, the Bootstrap colour, and whether it has a category. The duplicate `/blog-post/:id` route in `App.js` is removed. The first `/blog-post/:id` route was the one in use, so routing does not change. Each route gives its component a different `key`, so React remounts the component when you go from articles to blog posts.
+- **Files:**
+  - Added: `frontend/src/components/ContentList.js`, `frontend/src/components/ContentDetail.js`, `frontend/src/components/contentTypes.js`.
+  - Changed: `frontend/src/App.js` (imports and the 4 article and blog post routes).
+  - Deleted: `frontend/src/components/ArticlesList.js`, `BlogPostsList.js`, `ArticleDetail.js`, `BlogPostDetail.js`, and `BlogPost.js`. No file imported `BlogPost.js`.
+- **Why:** The two list files and the two detail files differed only in names, API paths, labels, colours and the article `category` field. One copy of the code is easier to maintain than two.
+- **How to undo:** Copy the 5 deleted files and `App.js` back from the backup folder. Then delete `ContentList.js`, `ContentDetail.js` and `contentTypes.js`.
+
+### Ignore the `.claude/` folder
+
+- **What changed:** `.claude/` is added to `.gitignore`.
+- **Files:** `.gitignore`.
+- **Why:** `.claude/` holds local Claude Code settings. It is not part of the application.
+- **How to undo:** Delete the `.claude/` line and its comment from `.gitignore`.
 
 ## Contributing
 

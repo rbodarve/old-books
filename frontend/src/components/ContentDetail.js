@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 
-export default function ArticleDetail({ currentUser }) {
+// Shared detail page for articles and blog posts. `type` comes from contentTypes.js.
+export default function ContentDetail({ currentUser, type }) {
     const { id } = useParams();
     const navigate = useNavigate();
-    const [article, setArticle] = useState(null);
+    const Singular = type.singular.charAt(0).toUpperCase() + type.singular.slice(1);
+    const [item, setItem] = useState(null);
     const [comments, setComments] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -13,20 +15,20 @@ export default function ArticleDetail({ currentUser }) {
     const [notice, setNotice] = useState(null);
 
     useEffect(() => {
-        fetchArticle();
+        fetchItem();
         fetchComments();
     }, [id]);
 
-    const fetchArticle = async () => {
+    const fetchItem = async () => {
         try {
-            const response = await fetch(`http://localhost:5000/api/articles/${id}`);
-            if (!response.ok) throw new Error('Article not found');
+            const response = await fetch(`http://localhost:5000/api/${type.apiPath}/${id}`);
+            if (!response.ok) throw new Error(`${Singular} not found`);
             const data = await response.json();
-            setArticle(data);
+            setItem(data);
             setError(null);
         } catch (err) {
-            console.error('Error fetching article:', err);
-            setError('Failed to load article');
+            console.error(`Error fetching ${type.singular}:`, err);
+            setError(`Failed to load ${type.singular}`);
         } finally {
             setLoading(false);
         }
@@ -34,7 +36,7 @@ export default function ArticleDetail({ currentUser }) {
 
     const fetchComments = async () => {
         try {
-            const response = await fetch(`http://localhost:5000/api/comments/Article/${id}`);
+            const response = await fetch(`http://localhost:5000/api/comments/${type.commentType}/${id}`);
             if (!response.ok) throw new Error('Failed to fetch comments');
             const data = await response.json();
             setComments(Array.isArray(data) ? data : []);
@@ -70,7 +72,7 @@ export default function ArticleDetail({ currentUser }) {
                     'Authorization': `Bearer ${token}`
                 },
                 body: JSON.stringify({
-                    contentType: 'Article',
+                    contentType: type.commentType,
                     contentId: id,
                     content: commentText
                 })
@@ -116,7 +118,7 @@ export default function ArticleDetail({ currentUser }) {
     const handleToggleCommentsDisabled = async () => {
         const token = sessionStorage.getItem('token');
         try {
-            const response = await fetch(`http://localhost:5000/api/comments/Article/${id}/toggle-disable`, {
+            const response = await fetch(`http://localhost:5000/api/comments/${type.commentType}/${id}/toggle-disable`, {
                 method: 'PUT',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -126,10 +128,10 @@ export default function ArticleDetail({ currentUser }) {
 
             if (!response.ok) throw new Error('Failed to toggle comments');
             const data = await response.json();
-            setArticle({ ...article, commentsDisabled: data.commentsDisabled });
-            setNotice({ 
-                type: 'info', 
-                message: `Comments ${data.commentsDisabled ? 'disabled' : 'enabled'}` 
+            setItem({ ...item, commentsDisabled: data.commentsDisabled });
+            setNotice({
+                type: 'info',
+                message: `Comments ${data.commentsDisabled ? 'disabled' : 'enabled'}`
             });
             setTimeout(() => setNotice(null), 3000);
         } catch (err) {
@@ -138,9 +140,9 @@ export default function ArticleDetail({ currentUser }) {
         }
     };
 
-    if (loading) return <div className="container mt-5 text-center"><div className="spinner-border text-primary"></div><p>Loading article...</p></div>;
+    if (loading) return <div className="container mt-5 text-center"><div className="spinner-border text-primary"></div><p>Loading {type.singular}...</p></div>;
     if (error) return <div className="alert alert-danger mt-5 container">{error}</div>;
-    if (!article) return <div className="alert alert-warning mt-5 container">Article not found</div>;
+    if (!item) return <div className="alert alert-warning mt-5 container">{Singular} not found</div>;
 
     return (
         <div className="container mt-5 mb-5">
@@ -150,19 +152,21 @@ export default function ArticleDetail({ currentUser }) {
                     <button type="button" className="btn-close" onClick={() => setNotice(null)}></button>
                 </div>
             )}
-            
-            <button className="btn btn-secondary mb-4" onClick={() => navigate('/articles')}>← Back to Articles</button>
-            
+
+            <button className="btn btn-secondary mb-4" onClick={() => navigate(type.listPath)}>← Back to {type.title}s</button>
+
             <article>
-                <h1 className="mb-3">{article.title}</h1>
+                <h1 className="mb-3">{item.title}</h1>
                 <div className="text-muted mb-4">
                     <small>
-                        By <strong>{article.createdBy?.username || article.author}</strong> {article.createdBy?.role === 'manager' && '(Manager)'} • 
-                        {article.category && <> <span className="badge bg-primary">{article.category}</span></>} •
-                        {new Date(article.createdAt).toLocaleDateString('en-US', { 
-                            year: 'numeric', 
-                            month: 'long', 
-                            day: 'numeric' 
+                        By <strong>{item.createdBy?.username || item.author}</strong> {item.createdBy?.role === 'manager' && '(Manager)'} •
+                        {type.hasCategory
+                            ? <>{item.category && <> <span className="badge bg-primary">{item.category}</span></>} •</>
+                            : item.bookTitle && <> About <strong>{item.bookTitle}</strong> •</>}
+                        {new Date(item.createdAt).toLocaleDateString('en-US', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric'
                         })}
                     </small>
                 </div>
@@ -170,7 +174,7 @@ export default function ArticleDetail({ currentUser }) {
                 <div className="card mb-4 shadow-sm">
                     <div className="card-body">
                         <p className="card-text" style={{ whiteSpace: 'pre-wrap', lineHeight: '1.6' }}>
-                            {article.content}
+                            {item.content}
                         </p>
                     </div>
                 </div>
@@ -182,23 +186,23 @@ export default function ArticleDetail({ currentUser }) {
                 <div className="d-flex justify-content-between align-items-center mb-4">
                     <h3 className="mb-0">💬 Comments ({comments.length})</h3>
                     {currentUser && (currentUser.role === 'manager' || currentUser.role === 'admin') && (
-                        <button 
-                            className={`btn btn-sm ${article?.commentsDisabled ? 'btn-success' : 'btn-warning'}`}
+                        <button
+                            className={`btn btn-sm ${item?.commentsDisabled ? 'btn-success' : 'btn-warning'}`}
                             onClick={handleToggleCommentsDisabled}
                         >
-                            {article?.commentsDisabled ? '✓ Enable Comments' : '✗ Disable Comments'}
+                            {item?.commentsDisabled ? '✓ Enable Comments' : '✗ Disable Comments'}
                         </button>
                     )}
                 </div>
 
-                {article?.commentsDisabled && (
+                {item?.commentsDisabled && (
                     <div className="alert alert-warning mb-4">
-                        <strong>⚠️ Comments are disabled</strong> for this article.
+                        <strong>⚠️ Comments are disabled</strong> for this {type.singular}.
                     </div>
                 )}
 
                 {/* Comment Form */}
-                {currentUser && !article?.commentsDisabled && (
+                {currentUser && !item?.commentsDisabled && (
                     <div className="card mb-4 shadow-sm">
                         <div className="card-body">
                             <h6 className="card-title mb-3">Leave a Comment</h6>
@@ -211,8 +215,8 @@ export default function ArticleDetail({ currentUser }) {
                                     onChange={(e) => setCommentText(e.target.value)}
                                     disabled={submittingComment}
                                 ></textarea>
-                                <button 
-                                    type="submit" 
+                                <button
+                                    type="submit"
                                     className="btn btn-primary"
                                     disabled={submittingComment || !commentText.trim()}
                                 >
@@ -222,14 +226,14 @@ export default function ArticleDetail({ currentUser }) {
                         </div>
                     </div>
                 )}
-                {!currentUser && !article?.commentsDisabled && (
+                {!currentUser && !item?.commentsDisabled && (
                     <div className="alert alert-info mb-4">
                         <p>Please <a href="/login">log in</a> to leave a comment.</p>
                     </div>
                 )}
-                {article?.commentsDisabled && currentUser && (
+                {item?.commentsDisabled && currentUser && (
                     <div className="alert alert-warning mb-4">
-                        <p>Comments are currently disabled for this article.</p>
+                        <p>Comments are currently disabled for this {type.singular}.</p>
                     </div>
                 )}
 
