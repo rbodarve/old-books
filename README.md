@@ -243,7 +243,7 @@ npm run build
 
 ## Simplification changes (2026-10-11)
 
-These changes keep all URLs, API calls and visible pages the same. The backend models, routes and database collections are not changed. Backups of every changed or deleted file are in `C:\Users\rboda\backups\old-books-cuts-2026-10-11\`.
+These changes keep all URLs, API calls and visible pages the same. The backend models, routes and database collections are not changed.
 
 ### Fix: declare the missing `express-async-handler` dependency
 
@@ -267,7 +267,7 @@ These changes keep all URLs, API calls and visible pages the same. The backend m
   - Changed: `frontend/src/App.js` (imports and the 4 article and blog post routes).
   - Deleted: `frontend/src/components/ArticlesList.js`, `BlogPostsList.js`, `ArticleDetail.js`, `BlogPostDetail.js`, and `BlogPost.js`. No file imported `BlogPost.js`.
 - **Why:** The two list files and the two detail files differed only in names, API paths, labels, colours and the article `category` field. One copy of the code is easier to maintain than two.
-- **How to undo:** Copy the 5 deleted files and `App.js` back from the backup folder. Then delete `ContentList.js`, `ContentDetail.js` and `contentTypes.js`.
+- **How to undo:** In `frontend/src/`, run `git checkout 47527cd~1 -- App.js components/ArticlesList.js components/BlogPostsList.js components/ArticleDetail.js components/BlogPostDetail.js components/BlogPost.js`. Then delete `ContentList.js`, `ContentDetail.js` and `contentTypes.js`.
 
 ### Ignore the `.claude/` folder
 
