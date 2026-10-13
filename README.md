@@ -276,6 +276,107 @@ These changes keep all URLs, API calls and visible pages the same. The backend m
 - **Why:** `.claude/` holds local Claude Code settings. It is not part of the application.
 - **How to undo:** Delete the `.claude/` line and its comment from `.gitignore`.
 
+## Suggestions (2026-10-13)
+
+These fixes are suggestions only. No code file in this repository is changed. Each fix was tried in a clean copy of commit `b0e8c14` on Windows 11 with Node v26.3.0, where npm runs scripts in `cmd.exe`. The output below comes from that copy.
+
+### Fix: replace `nodemon` with `node --watch` in the `dev` script
+
+- **What:** The `dev` script calls `nodemon`, but `nodemon` is not in `backend/package.json`.
+- **Where:** `backend/package.json:18`, README "Prerequisites".
+- **Why:** Node 18.11 and later restart on file changes with the built-in `--watch` flag. This fix needs no new dependency, but it raises the minimum Node version. Rejected option: add `nodemon` as a devDependency. That adds a package for a feature that Node already has.
+- **Diff:**
+  ```diff
+  --- backend/package.json
+  -    "dev": "nodemon server.js",
+  +    "dev": "node --watch server.js",
+  --- README.md (Prerequisites)
+  -- **Node.js** (v14 or higher)
+  +- **Node.js** (v18.11 or higher)
+  ```
+- **Before:** `npm run dev` → `'nodemon' is not recognized as an internal or external command`, exit 1.
+- **After:** `npm run dev` → `> node --watch server.js` … `MongoDB connected successfully` … `Server running on http://localhost:5000`.
+
+### Fix: use the article categories from the model in the route and the form
+
+- **What:** The route and the form use the category `General`, and the form also offers `Events`. The enum in the model has neither value, so Mongoose rejects such an article.
+- **Where:** `backend/models/articleModel.js:9` (enum, unchanged), `backend/routes/articleRoutes.js:33`, `frontend/src/components/contentTypes.js:15`, `frontend/src/components/ContentList.js:7`, `:131-135` and `:171`.
+- **Why:** The model enum is the source of truth, and its default is already `Other`. The route leaves an empty category as `undefined`, so Mongoose applies that default. The form reads the values from `contentTypes.js`, like `BOOK_CATEGORIES` in `BookCatalog.js`. Rejected option: add `General` and `Events` to the enum. Then `General` and `Other` would both mean "no category".
+- **Diff:**
+  ```diff
+  --- backend/routes/articleRoutes.js
+  -        category: category || "General",
+  +        category: category || undefined, // undefined lets the schema default apply
+  --- frontend/src/components/contentTypes.js
+  -    hasCategory: true
+  +    hasCategory: true,
+  +    // Same values as the enum in backend/models/articleModel.js
+  +    categories: ['Tips', 'How-To', 'News', 'Reviews', 'Industry Insights', 'Other']
+  --- frontend/src/components/ContentList.js
+  -    const emptyForm = type.hasCategory ? { title: '', content: '', category: 'General' } : { title: '', content: '' };
+  +    const emptyForm = type.hasCategory ? { title: '', content: '', category: 'Other' } : { title: '', content: '' };
+  ...
+  -                                        <option value="General">General</option>
+  -                                        <option value="News">News</option>
+  -                                        <option value="Tips">Tips</option>
+  -                                        <option value="Reviews">Reviews</option>
+  -                                        <option value="Events">Events</option>
+  +                                        {type.categories.map(c => <option key={c} value={c}>{c}</option>)}
+  ...
+  -                                    {type.hasCategory && <span className="badge bg-primary mb-2">{item.category || 'General'}</span>}
+  +                                    {type.hasCategory && <span className="badge bg-primary mb-2">{item.category}</span>}
+  ```
+- **Before:** A script ran `new Article({...}).validateSync()` for every category that the form and the route can send. No database is needed. `General` → ``category: `General` is not a valid enum value``. `Events` → same error. `News`, `Tips`, `Reviews` → valid.
+- **After:** The same script reads `categories` from `contentTypes.js`. `Tips`, `How-To`, `News`, `Reviews`, `Industry Insights`, `Other` → all valid. An empty or missing category → `Other`, valid. `npm run build` in `frontend/` → `Compiled successfully.`
+
+### Fix: remove the Unix-style environment variable scripts
+
+- **What:** `start:https`, `start:http` and `dev:https` use `USE_HTTPS=true node ...`. `cmd.exe` does not support this syntax.
+- **Where:** `backend/package.json:16`, `:17`, `:19`. `backend/server.js:134` reads `process.env.USE_HTTPS === 'true'`. README "Installation" step 5 (the note under the commands).
+- **Why:** `start:http` does the same as `npm start`, because HTTP is the default. For HTTPS, set the variable in the shell. npm passes it on to `node`. This needs no new package. Rejected option: `cross-env`. It adds a dependency for 2 scripts.
+- **Diff:**
+  ```diff
+  --- backend/package.json
+  -    "start:https": "USE_HTTPS=true node server.js",
+  -    "start:http": "USE_HTTPS=false node server.js",
+  -    "dev:https": "USE_HTTPS=true nodemon server.js",
+  --- README.md (note under step 5)
+  -   ... The `start:https`, `start:http` and `dev:https` scripts in `backend/package.json` use Unix-style environment variables. They do not run in PowerShell or cmd.
+  +   ... For HTTPS (needs `backend/ssl/server.key` and `server.cert`), set `USE_HTTPS` before `npm start` (or `npm run dev`):
+  +   - PowerShell: `$env:USE_HTTPS='true'; npm start`
+  +   - cmd: `set USE_HTTPS=true&& npm start` (no space before `&&`)
+  +   The variable stays set until you close the terminal. Open a new terminal to go back to HTTP.
+  ```
+- **Before:** `npm run start:http` → `'USE_HTTPS' is not recognized as an internal or external command`, exit 1.
+- **After:** In PowerShell, `$env:USE_HTTPS='true'; npm start` → `✓ HTTPS Server running on https://localhost:5000` and `✓ HTTP redirect server running on http://localhost:5080 -> HTTPS`. Without the variable, `npm run dev` → `Server running on http://localhost:5000`. In cmd, `set USE_HTTPS=true&& node -e "…"` gives node the value `"true"`. With a space before `&&`, node gets `"true "`, so `server.js` does not use HTTPS.
+
+### Fix: remove the `seed` script and the seeding section
+
+- **What:** `npm run seed` runs `node seeds.js`, but `backend/seeds.js` does not exist.
+- **Where:** `backend/package.json:20`, README "Seeding the Database (Optional)".
+- **Why:** `git log --all -- '*seed*'` returns no commits. The file never existed in this repository, so there is nothing to restore. Rejected option: write a new seed script. That is a new feature, not a fix.
+- **Diff:**
+  ```diff
+  --- backend/package.json
+  -    "seed": "node seeds.js"
+  --- README.md
+  -### Seeding the Database (Optional)
+  -
+  -If you have a seed script:
+  -```bash
+  -cd backend
+  -npm run seed
+  -```
+  ```
+  The script above `seed` is then the last entry, so delete its trailing comma.
+- **Before:** `npm run seed` → `Error: Cannot find module '...\backend\seeds.js'`.
+- **After:** The script is gone. `npm run seed` → `npm error Missing script: "seed"`.
+
+### Other notes
+
+- Rejected defects: none. All 4 suspected defects are confirmed above.
+- `MongoDB connected successfully` is printed twice at start: `backend/config/db.js:13` prints it and so does `backend/server.js:147` or `:161`. The message is cosmetic, so this README suggests no change for it.
+
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
