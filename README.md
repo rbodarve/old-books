@@ -140,10 +140,10 @@ old-books/
 
 3. **Set up environment variables**
 
-   Create a `.env` file in the `backend/` directory:
+   Create a `.env` file in the `backend/` directory. `backend/.env.example` lists all variables:
    ```env
    # MongoDB Connection
-   MONGODB_URI=mongodb://localhost:27017/oldbooks
+   MONGO_URI=mongodb://localhost:27017/oldbooks
    
    # JWT Secret (use a strong random string)
    JWT_SECRET=your_jwt_secret_key_here
@@ -152,8 +152,9 @@ old-books/
    PORT=5000
    NODE_ENV=development
    
-   # Frontend URL (for CORS)
-   FRONTEND_URL=http://localhost:3000
+   # Allowed frontend origins for CORS, comma-separated.
+   # Without this variable, only https://localhost:3000 is allowed.
+   CORS_ORIGINS=http://localhost:3000
    ```
 
 4. **Start MongoDB**
@@ -205,26 +206,46 @@ npm run seed
 - `DELETE /api/books/:id` - Delete book (Admin only)
 
 ### Reviews
-- `GET /api/reviews/:bookId` - Get reviews for a book
+- `GET /api/reviews/book/:bookId` - Get reviews for a book
+- `GET /api/reviews/book/:bookId/stats` - Get rating statistics for a book
 - `POST /api/reviews` - Create review (Authenticated users)
+- `DELETE /api/reviews/:reviewId` - Delete review (Owner, Manager or Admin)
+- `PUT /api/reviews/:reviewId/warning` - Add a warning to a review (Manager or Admin)
+- `PUT /api/reviews/:bookId/toggle-disable` - Turn reviews for a book on or off (Manager or Admin)
 
 ### Users
-- `GET /api/users/profile` - Get user profile (Authenticated)
-- `PUT /api/users/profile` - Update profile (Authenticated)
+- `GET /api/users` - Get all users (Admin only)
 
 ### Blog
 - `GET /api/blog` - Get all blog posts
 - `GET /api/blog/:id` - Get blog post by ID
-- `POST /api/blog` - Create blog post (Admin only)
+- `POST /api/blog` - Create blog post (Manager or Admin)
+
+### Articles
+- `GET /api/articles` - Get all articles
+- `GET /api/articles/:id` - Get article by ID
+- `POST /api/articles` - Create article (Manager or Admin)
+- `PUT /api/articles/:id` - Update article (Admin only)
+- `DELETE /api/articles/:id` - Delete article (Admin only)
+
+### Comments
+- `GET /api/comments/:contentType/:contentId` - Get comments for an article or blog post
+- `GET /api/comments/:postId` - Get comments by post ID (legacy)
+- `GET /api/comments` - Get all comments (Admin only)
+- `POST /api/comments` - Create comment (Authenticated users)
+- `DELETE /api/comments/:commentId` - Delete comment (Owner, Manager or Admin)
+- `PUT /api/comments/:commentId/warning` - Add a warning to a comment (Manager or Admin)
+- `PUT /api/comments/:contentType/:contentId/toggle-disable` - Turn comments on or off (Manager or Admin)
 
 ## Features in Detail
 
 ### User Roles
 - **Regular Users**: Browse books, add to cart, write reviews, read blog
-- **Admin Users**: Full CRUD on books, manage users, create blog posts
+- **Manager Users**: Create articles and blog posts, add warnings to reviews and comments, turn reviews and comments on or off, delete any review or comment
+- **Admin Users**: Everything a manager can do, plus full CRUD on books, edit and delete articles, list users
 
 ### Security Features
-- Password hashing with bcrypt
+- Password hashing with bcryptjs
 - JWT-based authentication
 - Protected routes with authentication middleware
 - CORS configuration
@@ -376,6 +397,87 @@ These fixes are suggestions only. No code file in this repository is changed. Ea
 
 - Rejected defects: none. All 4 suspected defects are confirmed above.
 - `MongoDB connected successfully` is printed twice at start: `backend/config/db.js:13` prints it and so does `backend/server.js:147` or `:161`. The message is cosmetic, so this README suggests no change for it.
+
+## Review notes (2026-10-14)
+
+This is a post-course review. No code file in this repository is changed. The notes do not repeat the items in "Suggestions (2026-10-13)".
+
+### Known issues
+
+Each row names the defect, its place in the code and one fix idea.
+
+**High**
+
+| # | Where | Defect | Fix idea |
+|---|---|---|---|
+| E1 | `backend/server.js:117` | The error handler reads only `err.status` and `err.statusCode`. Controllers set `res.status(400/403/404)` and then throw, so these errors return 500. Mongoose `CastError` and `ValidationError` also return 500. | Use `res.statusCode` when it is 400 or higher. Map `CastError` and `ValidationError` to 400. |
+| E2 | `backend/controllers/authController.js:12,27` | `register` takes `role` from the request body. Anyone can register as `admin`. | Ignore `role` in the body. Always create a `user`. |
+| E3 | `backend/controllers/userController.js:7` | `GET /api/users` returns the password hash of every user. | Add `.select("-password")` to the query. |
+| X1 | `backend/server.js` | No route has a rate limit. An attacker can try passwords on `/api/auth/login` at full speed. | Limit the requests per IP address on `/api/auth`. |
+
+**Medium**
+
+| # | Where | Defect | Fix idea |
+|---|---|---|---|
+| E4 | `backend/server.js:120-123` | With `NODE_ENV=development`, the error response contains the stack trace and absolute file paths. | Write the stack trace to the log only. |
+| E5 | `backend/controllers/bookController.js:49-54` | The `search` value goes into `$regex` without escaping. `?search=(` returns 500. | Escape the regex special characters first. |
+| E6 | `backend/controllers/bookController.js:16-41` | `?minPrice=abc` makes an empty price filter, and the query returns 500. | Check that the value is a number. Return 400 if it is not. |
+| E7 | `backend/middleware/authMiddleware.js:4`, `backend/controllers/authController.js:5`, `backend/server.js:143` | The code has a fallback JWT secret and a fallback SSL passphrase. Without `JWT_SECRET`, anyone can sign an admin token. | Stop the server at start when `JWT_SECRET` is missing. |
+| E8 | `backend/server.js:72-77` | A request from a disallowed origin returns 500. | Call `callback(null, false)` instead of passing an error. |
+| F1 | `frontend/src/App.js:38-45` | The user is restored from `sessionStorage` only after the first render. A reload of a protected page goes to `/login`. | Read `sessionStorage` in the `useState` initializer. |
+| F2 | `frontend/src/components/ReviewSection.js:229` | The owner check compares `currentUser._id`. The login response has `id`, so users never see Delete on their own review. | Compare `currentUser.id`. |
+| F3 | `frontend/src/components/ContentDetail.js:261` | The same `_id` mismatch hides Delete on a user's own comment. | Compare `currentUser.id`. |
+| X2 | `backend/controllers/authController.js:8` | A token is valid for 30 days and cannot be revoked. | Use a shorter expiry. |
+| X3 | `backend/controllers/reviewController.js:64`, `backend/controllers/bookController.js:72` | Public routes return the email address of reviewers and book creators. | Populate `username` only. |
+
+**Low**
+
+| # | Where | Defect | Fix idea |
+|---|---|---|---|
+| E9 | `backend/controllers/bookController.js:11-13,44-46` | `?category[$ne]=x` passes a query operator to MongoDB and returns all books. | Accept string values only. |
+| E10 | `backend/controllers/bookController.js:83-128,174` | An unknown category, a numeric ISBN or a duplicate ISBN returns 500. | Validate the body. Map the duplicate-key error to 409. |
+| E11 | `backend/controllers/bookController.js:157,166`, `backend/controllers/reviewController.js:23,45` | `"12abc"` is stored as price 12, and rating 4.7 is stored as 4. | Reject values that are not valid numbers. |
+| E12 | `backend/controllers/bookController.js:191` | Deleting a book keeps its reviews. | Delete the reviews of the book too. |
+| E13 | `backend/controllers/commentController.js:34` | Whitespace-only content passes the check and then fails the schema with 500. The same happens in `createReview`. | Check `content.trim()`. |
+| E14 | `backend/controllers/authController.js:21,53` | A password or email that is not a string returns 500. | Check the types. Return 400. |
+| E15 | `backend/routes/articleRoutes.js:43-46` | A manager can create an article but cannot edit or delete it. The route comment says this is intended. | No change, or allow the owner. |
+| E16 | `frontend/src/components/ReviewSection.js:23` | The stars use Font Awesome classes, but no Font Awesome CSS is loaded. The stars are empty. | Use a text star (★). |
+| E17 | `frontend/src/config.js` | `REACT_APP_API_URL` has no effect. No file imports `config.js`, and 20 calls use `http://localhost:5000`. | Import `API_URL` from `config.js`. |
+| F11 | `frontend/src/components/Dashboard.js:3`, `frontend/src/App.js:92` | `/user-dashboard` shows "Access Denied" to every non-admin user. | Remove the route (see simplification idea 10). |
+
+### Simplification ideas
+
+1. Merge `CreateBookPage.js` and `AdminBookEdit.js` in `frontend/src/pages/admin/` into one form component (about -200 lines).
+2. Merge `PublicHome.js` and `BookCatalog.js` in `frontend/src/components/` into one catalog component (about -200 lines).
+3. Move the book category and condition lists, copied in 4 files, into one module like `contentTypes.js`.
+4. Import `API_URL` from `frontend/src/config.js` instead of 20 hardcoded URLs (see E17).
+5. Remove `frontend/src/utils/coverImage.js`. No file imports it.
+6. Remove the `bcrypt` dependency from `backend/package.json`. The code imports only `bcryptjs`.
+7. Remove the three `@fortawesome` packages from `frontend/package.json`. No file imports them.
+8. Remove the 7 `if (!req.user)` checks in the review and comment controllers. `protect` already returns 401.
+9. Use the `protect, admin` middleware for article PUT and DELETE in `backend/routes/articleRoutes.js`, as in `bookRoutes.js`.
+10. Remove the legacy `GET /api/comments/:postId` route and `getCommentsByPostId`. The frontend does not call it.
+11. Remove the `/user-dashboard` route and `Dashboard.js`. No link points to them.
+12. Use `asyncHandler` in the book and blog controllers instead of one `try`/`catch` per handler (after the E1 fix).
+13. Remove `useNewUrlParser`, `useUnifiedTopology` and the second `dotenv.config()` from `backend/config/db.js`.
+14. Remove the duplicate header removal and the unused `exposedHeaders` in `backend/server.js`.
+15. Export the JWT secret lookup from one file instead of two (see E7).
+
+### Tested
+
+The API was tested with HTTP requests to the real `backend/server.js` (Node v26.3.0) and a throwaway local MongoDB database.
+
+- 28 targeted requests: 5 gave the expected result.
+- 300 random requests with valid and invalid input: 56 returned 500. Every 500 maps to E1, E5, E6 or E13.
+
+E7, F1–F3, F11, E16, E17 and X1–X3 come from reading the code.
+
+### Not tested
+
+- The frontend in a browser.
+- HTTPS mode.
+- Token expiry.
+- Concurrent writes.
 
 ## Contributing
 
